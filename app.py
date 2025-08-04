@@ -24,16 +24,25 @@ print("✅ Loaded ENV:", os.getenv("MYSQL_USER"), "(pass hidden)")
 ip = requests.get("https://api.ipify.org").text
 st.markdown(f"**Public IP Address of this app:** `{ip}`")
 
+# def get_db_connection():
+#     return pymysql.connect(
+#         host=os.getenv("MYSQL_HOST"),
+#         port=int(os.getenv("MYSQL_PORT", 3306)),  
+#         user=os.getenv("MYSQL_USER"),
+#         password=os.getenv("MYSQL_PASS"),
+#         database=os.getenv("MYSQL_DB"),
+#         cursorclass=pymysql.cursors.DictCursor
+#     )
+
 def get_db_connection():
     return pymysql.connect(
-        host=os.getenv("MYSQL_HOST"),
-        port=int(os.getenv("MYSQL_PORT", 3306)),  
-        user=os.getenv("MYSQL_USER"),
-        password=os.getenv("MYSQL_PASS"),
-        database=os.getenv("MYSQL_DB"),
+        host=st.secrets["MYSQL_HOST"],
+        port=int(st.secrets.get("MYSQL_PORT", 3306)),
+        user=st.secrets["MYSQL_USER"],
+        password=st.secrets["MYSQL_PASS"],
+        database=st.secrets["MYSQL_DB"],
         cursorclass=pymysql.cursors.DictCursor
     )
-
 def hash_password(password):
     # Generate a salt and hash the password
     salt = bcrypt.gensalt()
