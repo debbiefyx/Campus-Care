@@ -27,7 +27,7 @@ st.markdown(f"**Public IP Address of this app:** `{ip}`")
 def get_db_connection():
     return pymysql.connect(
         host=os.getenv("MYSQL_HOST"),
-        port=int(os.getenv("MYSQL_PORT", 3306)),  # Default port if not specified
+        port=int(os.getenv("MYSQL_PORT", 3306)),  
         user=os.getenv("MYSQL_USER"),
         password=os.getenv("MYSQL_PASS"),
         database=os.getenv("MYSQL_DB"),
@@ -429,7 +429,7 @@ if st.session_state.page == "overview":
     st.markdown("")
 
     features = [
-        {"step": "1", "title": "📊 Dashboard", "desc": "View your mental health facts, track progress, and access your toolkit."},
+        {"step": "1", "title": "🚀 Getting Started", "desc": "Begin your wellness journey by exploring tools and resources tailored to your needs."},
         {"step": "2", "title": "🧠 Self-Assessment", "desc": "Take a quick 7-question quiz to check your current well-being score."},
         {"step": "3", "title": "🚦 Smart Pathways", "desc": "Based on your results, navigate between High-Risk or Low-Risk pathways."},
         {"step": "4", "title": "🛡️ Risk Detection", "desc": "Multi-layered analysis helps identify your support needs accurately."},
