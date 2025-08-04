@@ -1,3 +1,4 @@
+import requests
 import streamlit as st
 import pymysql
 import pickle
@@ -17,11 +18,11 @@ from sklearn.preprocessing import MinMaxScaler
 from scipy.spatial.distance import euclidean
 from datetime import datetime
 
-# ────────────────────────────────
-#        CONFIGURE MySQL
-# ────────────────────────────────
-
 load_dotenv()
+print("✅ Loaded ENV:", os.getenv("MYSQL_USER"), "(pass hidden)")
+
+ip = requests.get("https://api.ipify.org").text
+st.markdown(f"**Public IP Address of this app:** `{ip}`")
 
 def get_db_connection():
     return pymysql.connect(
@@ -158,7 +159,6 @@ def get_self_check_stats(user_id):
     return total, low, high
 
 def get_recent_clusters(user_id):
-    # Load cluster metadata CSV
     cluster_df = pd.read_csv("all_cluster_profiles.csv")
 
     # Build a lookup: {(group_label, cluster_num): (friendly_name, description)}
@@ -222,7 +222,7 @@ def save_reflection(user_id, module_name, reflection):
 # ────────────────────────────────
 # Streamlit Session & UI Setup
 # ────────────────────────────────
-st.set_page_config(page_title="UOW Wellness App", layout="wide")
+st.set_page_config(page_title="Campus Care", layout="wide")
 
 PAGES = {
     "🏠 Overview": "overview",
@@ -268,17 +268,6 @@ st.markdown("""
     border-radius: 8px;
     margin: 5px auto;
     display: block;
-}
-
-/* Feature cards and form */
-.form-container {
-    background-color: rgba(255, 255, 255, 0.92);
-    padding: 2.5rem;
-    border-radius: 12px;
-    max-width: 500px;
-    margin: 100px auto;
-    box-shadow: 0px 0px 20px rgba(0,0,0,0.2);
-    text-align: center;
 }
 
 .feature-card {
@@ -430,8 +419,14 @@ with st.sidebar:
 #     Homepage / Feature Overview 
 # -----------------------------------
 if st.session_state.page == "overview":
-    st.markdown("## 🧭 How UOW Wellness Works \n")
+    st.markdown("""
+    <div style='text-align: justify; font-size: 20px;'>
+        🧭 <strong>Campus Care</strong> is a student-centered wellbeing platform designed to support your mental health, emotional balance, and personal growth throughout your university journey. Whether you need a moment to reflect, a safe space to check in, or tools to help manage stress, Campus Care is here to walk with you — every step of the way.
+    </div>
+""", unsafe_allow_html=True)
     st.markdown("---")
+    st.markdown("##### With Campus Care, you can:\n")
+    st.markdown("")
 
     features = [
         {"step": "1", "title": "📊 Dashboard", "desc": "View your mental health facts, track progress, and access your toolkit."},
@@ -455,6 +450,9 @@ if st.session_state.page == "overview":
                     <p style="margin: 8px 0 0 0; font-size: 1em; color: #333;">{f['desc']}</p>
                 </div>
                 """, unsafe_allow_html=True)
+    st.markdown("---")
+    st.markdown("Because caring for your mind is just as important as your grades.\n")
+    st.markdown("##### Welcome to a campus that cares — welcome to Campus Care.\n")
 
 # --------------------------------------
 #     Authentication Page (DB-based) 
