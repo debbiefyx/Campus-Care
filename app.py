@@ -20,21 +20,6 @@ from datetime import datetime
 # ────────────────────────────────
 #        CONFIGURE MySQL
 # ────────────────────────────────
-MYSQL_HOST = "localhost"
-MYSQL_PORT = 3306
-MYSQL_USER = "root"
-MYSQL_PASS = "theBye@413"
-MYSQL_DB   = "mentalhealthdb"
-
-# def get_db_connection():
-#     return pymysql.connect(
-#         host=MYSQL_HOST,
-#         port=MYSQL_PORT,
-#         user=MYSQL_USER,
-#         password=MYSQL_PASS,
-#         database=MYSQL_DB,
-#         cursorclass=pymysql.cursors.DictCursor
-#     )
 
 load_dotenv()
 
