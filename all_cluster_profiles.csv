@@ -1,0 +1,5 @@
+Cluster,Coursework_Pressure,Study_Hours_Per_Week,Academic_Workload,CoCurricular_Involvement,Isolation_Frequency,Physical_Activity_Freq,Sleep_Hours_Per_Night,Recent_Suicidal_Thoughts,Financial_Stress,Age,Group,Cluster_Description,Cluster_Name
+0,0.706666667,0.232903226,0.54,0.395,0.64,0.465,0.471111111,0.32,0.533333333,0.410666667,Moderate,Socially withdrawn but academically active,The Overwhelmed Balancer
+1,0.444444444,0.311827957,0.222222222,0.25,0.5,0.416666667,0.481481481,0.333333333,0.222222222,0.740740741,Moderate,Balanced but financially stressed,The Drifting Observer
+0,0.6875,0.22983871,0.680555556,0.395833333,0.625,0.46875,0.320512821,1,0.6875,0.208333333,Severe,"Emotionally exhausted, poor sleep, high isolation",The Struggling Achiever
+1,0.782608696,0.311360449,0.623188406,0.369565217,0.637681159,0.565217391,0.331103679,0,0.652173913,0.260869565,Severe,"Overwhelmed but engaged, good physical activity",The Silent Perfectionist
