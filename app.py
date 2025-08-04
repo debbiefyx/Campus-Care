@@ -12,14 +12,10 @@ import pandas as pd
 import plotly.graph_objects as go
 from pymysql.cursors import DictCursor
 import streamlit.components.v1 as components
-from dotenv import load_dotenv
 import plotly.graph_objects as go
 from sklearn.preprocessing import MinMaxScaler
 from scipy.spatial.distance import euclidean
 from datetime import datetime
-
-load_dotenv()
-print("✅ Loaded ENV:", os.getenv("MYSQL_USER"), "(pass hidden)")
 
 ip = requests.get("https://api.ipify.org").text
 st.markdown(f"**Public IP Address of this app:** `{ip}`")
