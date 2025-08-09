@@ -5,6 +5,7 @@ import pickle
 import joblib
 import numpy as np
 import pymysql.cursors
+import tempfile
 import time
 import bcrypt
 import os
@@ -30,15 +31,76 @@ st.markdown(f"**Public IP Address of this app:** `{ip}`")
 #         cursorclass=pymysql.cursors.DictCursor
 #     )
 
-def get_db_connection():
+# Add this helper (reads Streamlit secrets first, falls back to env vars)
+def _get_secret(key, default=None):
+    try:
+        import streamlit as st
+        if "mysql" in st.secrets and key in st.secrets["mysql"]:
+            return st.secrets["mysql"].get(key, default)
+        if key in st.secrets:
+            return st.secrets.get(key, default)
+    except Exception:
+        pass
+    return os.getenv(key, default)
+    
+# def get_db_connection():
+#     # Write CA PEM (from secrets) to a temp file so PyMySQL can use it
+#     ca_pem = st.secrets.get("MYSQL_SSL_CA_PEM")
+#     ca_path = None
+#     if ca_pem:
+#         ca_path = os.path.join(tempfile.gettempdir(), "do-ca.pem")
+#         if not os.path.exists(ca_path):
+#             with open(ca_path, "w", encoding="utf-8") as f:
+#                 f.write(ca_pem)
+
+#     ssl_args = {"ca": ca_path} if ca_path else None
+
+#     return pymysql.connect(
+#         host=st.secrets["MYSQL_HOST"],                 
+#         port=int(st.secrets.get("MYSQL_PORT", 3306)),
+#         user=st.secrets["MYSQL_USER"],
+#         password=st.secrets["MYSQL_PASS"],
+#         database=st.secrets["MYSQL_DB"],
+#         cursorclass=pymysql.cursors.DictCursor,
+#         ssl=ssl_args
+#     )
+
+@st.cache_resource
+def _db_connect():
+    # Full TLS verification with CA PEM from secrets
+    ca_pem = st.secrets.get("MYSQL_SSL_CA_PEM")
+    ca_path = st.secrets.get("MYSQL_SSL_CA")  # optional path if you ever ship a file
+    if ca_pem and not ca_path:
+        ca_path = os.path.join(tempfile.gettempdir(), "do-ca.pem")
+        if not os.path.exists(ca_path):
+            with open(ca_path, "w", encoding="utf-8") as f:
+                f.write(ca_pem)
+
+    ssl_args = {"ca": ca_path} if ca_path else None
+
     return pymysql.connect(
-        host=st.secrets["MYSQL_HOST"],
+        host=st.secrets["MYSQL_HOST"],              # must be the FQDN from DO
         port=int(st.secrets.get("MYSQL_PORT", 3306)),
         user=st.secrets["MYSQL_USER"],
         password=st.secrets["MYSQL_PASS"],
         database=st.secrets["MYSQL_DB"],
-        cursorclass=pymysql.cursors.DictCursor
+        cursorclass=pymysql.cursors.DictCursor,
+        ssl=ssl_args,
+        connect_timeout=10,
+        read_timeout=10,
+        write_timeout=10,
     )
+
+def get_db_connection():
+    # Reuse cached connection and ensure it’s alive
+    conn = _db_connect()
+    try:
+        conn.ping(reconnect=True)
+    except Exception:
+        _db_connect.clear()     # drop the cached connection and recreate
+        conn = _db_connect()
+    return conn
+
 def hash_password(password):
     # Generate a salt and hash the password
     salt = bcrypt.gensalt()
@@ -56,6 +118,7 @@ def get_user_id(username):
             row = cursor.fetchone()
             return row["id"] if row else None
 
+# Also fix validate_user to avoid double-encoding bytes from VARBINARY:
 def validate_user(username, password):
     conn = get_db_connection()
     with conn:
@@ -63,11 +126,24 @@ def validate_user(username, password):
             cursor.execute("SELECT password FROM users WHERE username = %s", (username,))
             row = cursor.fetchone()
             if row:
-                # Verify the provided password against the stored hashed password
-                stored_password = row["password"].encode('utf-8')  
-                if verify_password(stored_password, password):
-                    return True
+                stored_password = row["password"]
+                if isinstance(stored_password, str):
+                    stored_password = stored_password.encode("utf-8")
+                return bcrypt.checkpw(password.encode("utf-8"), stored_password)
     return False
+    
+# def validate_user(username, password):
+#     conn = get_db_connection()
+#     with conn:
+#         with conn.cursor() as cursor:
+#             cursor.execute("SELECT password FROM users WHERE username = %s", (username,))
+#             row = cursor.fetchone()
+#             if row:
+#                 # Verify the provided password against the stored hashed password
+#                 stored_password = row["password"].encode('utf-8')  
+#                 if verify_password(stored_password, password):
+#                     return True
+#     return False
 
 def create_user(username, password):
     conn = get_db_connection()
@@ -347,6 +423,20 @@ st.markdown("""
     border-left: 5px solid #3399cc;
     border-radius: 10px;
     margin-bottom: 1rem;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #EEEEEE;
+    color: #444;
+    text-align: center;
+    font-size: 0.9rem;
+    padding: 0.5rem;
+    border-top: 1px solid #eaeaea;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -458,6 +548,12 @@ if st.session_state.page == "overview":
     st.markdown("---")
     st.markdown("Because caring for your mind is just as important as your grades.\n")
     st.markdown("##### Welcome to a campus that cares — welcome to Campus Care.\n")
+
+    st.markdown("""
+    <div class="footer">
+        Developed by Debbie Foo, University of Wollongong Malaysia.
+    </div>
+    """, unsafe_allow_html=True)
 
 # --------------------------------------
 #     Authentication Page (DB-based) 
@@ -2049,22 +2145,7 @@ elif st.session_state.page == "dashboard":
         st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown(
-        """
-        <style>
-        .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #EEEEEE;
-            color: #444;
-            text-align: center;
-            font-size: 0.9rem;
-            padding: 0.5rem;
-            border-top: 1px solid #eaeaea;
-        }
-        </style>
-    
+        """    
         <div class="footer">
             Badge styles credited to <a href="https://uiverse.io/" target="_blank">Uiverse.io</a>, 
             <a href="https://freefrontend.com/css-badges/" target="_blank">FreeFrontend</a>, and 
