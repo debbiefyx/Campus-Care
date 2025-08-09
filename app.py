@@ -18,9 +18,6 @@ from sklearn.preprocessing import MinMaxScaler
 from scipy.spatial.distance import euclidean
 from datetime import datetime
 
-ip = requests.get("https://api.ipify.org").text
-st.markdown(f"**Public IP Address of this app:** `{ip}`")
-
 # def get_db_connection():
 #     return pymysql.connect(
 #         host=os.getenv("MYSQL_HOST"),
@@ -31,18 +28,6 @@ st.markdown(f"**Public IP Address of this app:** `{ip}`")
 #         cursorclass=pymysql.cursors.DictCursor
 #     )
 
-# Add this helper (reads Streamlit secrets first, falls back to env vars)
-def _get_secret(key, default=None):
-    try:
-        import streamlit as st
-        if "mysql" in st.secrets and key in st.secrets["mysql"]:
-            return st.secrets["mysql"].get(key, default)
-        if key in st.secrets:
-            return st.secrets.get(key, default)
-    except Exception:
-        pass
-    return os.getenv(key, default)
-    
 # def get_db_connection():
 #     # Write CA PEM (from secrets) to a temp file so PyMySQL can use it
 #     ca_pem = st.secrets.get("MYSQL_SSL_CA_PEM")
@@ -559,7 +544,7 @@ if st.session_state.page == "overview":
 #     Authentication Page (DB-based) 
 # --------------------------------------
 elif st.session_state.page == "auth":
-    st.markdown("### 👤 Welcome to UOW Wellness App")
+    st.markdown("### 👤 Welcome to Campus Care")
     auth_mode = st.radio("Choose an option", ["Log In", "Sign Up"], horizontal=True)
 
     username = st.text_input("Username")
