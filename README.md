@@ -28,9 +28,5 @@ Campus Care is a student-centered Streamlit app that helps university students r
   - Recent high-risk cluster visits with descriptions
   - Achievement-style badges based on behavior
   - Latest module reflections
-- Data storage (MySQL)
-  - Users, self-check logs, high-risk responses, reflections
-- Theming and UX polish
-  - Custom CSS, animations, and a default light theme (recommended)
 
 ---
