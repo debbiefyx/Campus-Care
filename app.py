@@ -18,43 +18,11 @@ from sklearn.preprocessing import MinMaxScaler
 from scipy.spatial.distance import euclidean
 from datetime import datetime
 
-# def get_db_connection():
-#     return pymysql.connect(
-#         host=os.getenv("MYSQL_HOST"),
-#         port=int(os.getenv("MYSQL_PORT", 3306)),  
-#         user=os.getenv("MYSQL_USER"),
-#         password=os.getenv("MYSQL_PASS"),
-#         database=os.getenv("MYSQL_DB"),
-#         cursorclass=pymysql.cursors.DictCursor
-#     )
-
-# def get_db_connection():
-#     # Write CA PEM (from secrets) to a temp file so PyMySQL can use it
-#     ca_pem = st.secrets.get("MYSQL_SSL_CA_PEM")
-#     ca_path = None
-#     if ca_pem:
-#         ca_path = os.path.join(tempfile.gettempdir(), "do-ca.pem")
-#         if not os.path.exists(ca_path):
-#             with open(ca_path, "w", encoding="utf-8") as f:
-#                 f.write(ca_pem)
-
-#     ssl_args = {"ca": ca_path} if ca_path else None
-
-#     return pymysql.connect(
-#         host=st.secrets["MYSQL_HOST"],                 
-#         port=int(st.secrets.get("MYSQL_PORT", 3306)),
-#         user=st.secrets["MYSQL_USER"],
-#         password=st.secrets["MYSQL_PASS"],
-#         database=st.secrets["MYSQL_DB"],
-#         cursorclass=pymysql.cursors.DictCursor,
-#         ssl=ssl_args
-#     )
-
 @st.cache_resource
 def _db_connect():
     # Full TLS verification with CA PEM from secrets
     ca_pem = st.secrets.get("MYSQL_SSL_CA_PEM")
-    ca_path = st.secrets.get("MYSQL_SSL_CA")  # optional path if you ever ship a file
+    ca_path = st.secrets.get("MYSQL_SSL_CA") 
     if ca_pem and not ca_path:
         ca_path = os.path.join(tempfile.gettempdir(), "do-ca.pem")
         if not os.path.exists(ca_path):
@@ -64,7 +32,7 @@ def _db_connect():
     ssl_args = {"ca": ca_path} if ca_path else None
 
     return pymysql.connect(
-        host=st.secrets["MYSQL_HOST"],              # must be the FQDN from DO
+        host=st.secrets["MYSQL_HOST"],           
         port=int(st.secrets.get("MYSQL_PORT", 3306)),
         user=st.secrets["MYSQL_USER"],
         password=st.secrets["MYSQL_PASS"],
@@ -77,7 +45,6 @@ def _db_connect():
     )
 
 def get_db_connection():
-    # Reuse cached connection and ensure it’s alive
     conn = _db_connect()
     try:
         conn.ping(reconnect=True)
@@ -116,19 +83,6 @@ def validate_user(username, password):
                     stored_password = stored_password.encode("utf-8")
                 return bcrypt.checkpw(password.encode("utf-8"), stored_password)
     return False
-    
-# def validate_user(username, password):
-#     conn = get_db_connection()
-#     with conn:
-#         with conn.cursor() as cursor:
-#             cursor.execute("SELECT password FROM users WHERE username = %s", (username,))
-#             row = cursor.fetchone()
-#             if row:
-#                 # Verify the provided password against the stored hashed password
-#                 stored_password = row["password"].encode('utf-8')  
-#                 if verify_password(stored_password, password):
-#                     return True
-#     return False
 
 def create_user(username, password):
     conn = get_db_connection()
