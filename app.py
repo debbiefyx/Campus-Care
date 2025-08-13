@@ -12,6 +12,7 @@ import os
 import pandas as pd
 from pymysql.cursors import DictCursor
 import streamlit.components.v1 as components
+import plotly.graph_objects as go
 from sklearn.preprocessing import MinMaxScaler
 from scipy.spatial.distance import euclidean
 from datetime import datetime
