@@ -1084,92 +1084,92 @@ elif st.session_state.page == "high_risk_pathway":
                     st.plotly_chart(fig, use_container_width=True)
                     
                     # Profile Insights
-                    with st.expander("🧠 View Cluster Insights"):
-                        if group_label == "Moderate":
-                            if cluster_assignment == 0:
-                                st.markdown("""
-                                ### 🌀 *The Overwhelmed Balancer* – Moderate Group
-                    
-                                **Profile Insights:**
-                                - High coursework pressure (**0.71**) despite moderate academic workload (**0.54**) and low study hours (**0.23**) — possibly due to procrastination or poor stress coping.
-                                - Moderate levels of **co-curricular involvement (0.40)** and **physical activity (0.47)** — trying to stay balanced.
-                                - Noticeable **financial stress (0.53)** and **early signs of suicidal thoughts (0.32)** — suggesting emotional vulnerability.
-                                - Average age is around **20–21**, possibly facing academic transition stress.
-                    
-                                **Summary:**  
-                                This group may struggle with time management and emotional stress despite a manageable workload.
-                    
-                                **Advice Focus:**
-                                - **Prioritize mental well-being:** Set aside regular time for relaxation and self-reflection. Practice mindful breathing or meditation to reduce anxiety from coursework pressure.
-                                - **Build supportive routines:** Structure your day with small, achievable goals for study and breaks. Use planners or habit trackers to visualize progress.
-                                - **Reach out for help:** Share your feelings about stress with trusted friends, family, or campus counselors. Early support can prevent escalation.
-                                - **Try resilience-building activities:** Journaling, gratitude exercises, and positive self-affirmations can help reframe negative thoughts and boost emotional strength.
-                                - **Stay active:** Moderate exercise, even short walks, can improve mood and energy.
-                                """)
-                    
-                            elif cluster_assignment == 1:
-                                st.markdown("""
-                                ### 🌫️ *The Drifting Observer* – Moderate Group
-                    
-                                **Profile Insights:**
-                                - Lowest **co-curricular involvement (0.22)** and **physical activity (0.42)** — indicating social and physical disengagement.
-                                - Younger age group (**~18 years**) with **low coursework pressure (0.44)** and **manageable stress levels**.
-                                - Mild presence of suicidal thoughts (**0.33**) suggests potential early warning signs.
-                                - Minimal isolation (**0.25**) — students are not disconnected, but may feel **unmotivated**.
-                    
-                                **Summary:**  
-                                These students are socially and physically inactive, possibly due to emotional detachment or a lack of academic direction.
-                    
-                                **Advice Focus:**
-                                - **Reconnect socially:** Join interest-based clubs or study groups to foster new friendships and a sense of belonging.
-                                - **Set gentle goals:** Rather than aiming for perfection, celebrate small achievements in your studies or social life.
-                                - **Practice self-kindness:** Avoid harsh self-criticism if you feel unmotivated; recognize that it’s okay to seek help and take breaks.
-                                - **Incorporate light activity:** Even easy movement like stretching or casual sports can support emotional health.
-                                - **Monitor mental signals:** If feelings of detachment or sadness persist, consider speaking with a mental health professional.
-                                """)
-                    
-                        elif group_label == "Severe":
-                            if cluster_assignment == 1:
-                                st.markdown("""
-                                ### 🎯 *The Silent Perfectionist* – Severe Group
-                    
-                                **Profile Insights:**
-                                - Extremely high coursework pressure (**0.78**) despite only moderate academic workload (**0.62**) — suggests **internalized pressure or perfectionism**.
-                                - **Less financial stress** — their stress likely comes from **self-imposed expectations**, not external hardship.
-                                - Slightly **better sleep quality (0.56)** and **lower suicidal thoughts (0.33)** than other severe groups — but signs may be **masked**.
-                                - Moderate levels of **co-curricular involvement** and **physical activity** — indicating **social participation**, but emotional weight remains.
-                    
-                                **Summary:**  
-                                This group is high-functioning on the outside but battles **internal perfectionism** that silently impacts mental health.
-                    
-                                **Advice Focus:**
-                                - **Challenge perfectionist thinking:** Remind yourself that making mistakes is part of growth. Practice self-compassion and avoid comparing yourself to others.
-                                - **Set realistic expectations:** Focus on progress, not perfection. Use “good enough” goals to reduce internal pressure.
-                                - **Care for your emotional health:** Schedule regular relaxation, creative hobbies, or social time to balance academic demands.
-                                - **Talk about your feelings:** Share concerns about self-imposed pressure with mentors, friends, or therapists—opening up can help lighten emotional burdens.
-                                - **Maintain healthy habits:** Continue physical activity and social engagement, but listen to your body and rest when needed.
-                                """)
-                    
-                            elif cluster_assignment == 0:
-                                st.markdown("""
-                                ### 💢 *The Struggling Achiever* – Severe Group
-                    
-                                **Profile Insights:**
-                                - High **academic workload (0.68)** and **coursework pressure (0.69)** — academic overload is intense.
-                                - Very low **sleep (0.47)** and **extremely high financial stress (1.00)** — signs of major life strain.
-                                - **High suicidal thoughts (0.32)** despite some participation in physical and co-curricular activities — may be masking severe distress.
-                                - Very young age (**~17–18 years old**) suggests difficulty adjusting to university-level challenges.
-                    
-                                **Summary:**  
-                                These students are under severe academic, financial, and emotional stress and may be silently struggling.
-                    
-                                **Advice Focus:**
-                                - **Seek immediate support:** Don’t hesitate to reach out to crisis counselors, hotlines, or mental health services if distress feels overwhelming.
-                                - **Establish a sleep routine:** Try to set a regular bedtime, limit screen time before bed, and create a calming nighttime ritual.
-                                - **Address financial worries:** Connect with student support services about financial aid, scholarships, or budgeting workshops to reduce stressors.
-                                - **Practice emotional check-ins:** Use mood tracking apps or daily reflection to recognize your emotional state and ask for help early.
-                                - **Balance workload:** Break tasks into manageable steps and allow yourself regular rest—your health comes first.
-                                """)
+                    # with st.expander("🧠 View Cluster Insights"):
+                    if group_label == "Moderate":
+                        if cluster_assignment == 0:
+                            st.markdown("""
+                            ### 🌀 *The Overwhelmed Balancer* – Moderate Group
+                
+                            **Profile Insights:**
+                            - High coursework pressure (**0.71**) despite moderate academic workload (**0.54**) and low study hours (**0.23**) — possibly due to procrastination or poor stress coping.
+                            - Moderate levels of **co-curricular involvement (0.40)** and **physical activity (0.47)** — trying to stay balanced.
+                            - Noticeable **financial stress (0.53)** and **early signs of suicidal thoughts (0.32)** — suggesting emotional vulnerability.
+                            - Average age is around **20–21**, possibly facing academic transition stress.
+                
+                            **Summary:**  
+                            This group may struggle with time management and emotional stress despite a manageable workload.
+                
+                            **Advice Focus:**
+                            - **Prioritize mental well-being:** Set aside regular time for relaxation and self-reflection. Practice mindful breathing or meditation to reduce anxiety from coursework pressure.
+                            - **Build supportive routines:** Structure your day with small, achievable goals for study and breaks. Use planners or habit trackers to visualize progress.
+                            - **Reach out for help:** Share your feelings about stress with trusted friends, family, or campus counselors. Early support can prevent escalation.
+                            - **Try resilience-building activities:** Journaling, gratitude exercises, and positive self-affirmations can help reframe negative thoughts and boost emotional strength.
+                            - **Stay active:** Moderate exercise, even short walks, can improve mood and energy.
+                            """)
+                
+                        elif cluster_assignment == 1:
+                            st.markdown("""
+                            ### 🌫️ *The Drifting Observer* – Moderate Group
+                
+                            **Profile Insights:**
+                            - Lowest **co-curricular involvement (0.22)** and **physical activity (0.42)** — indicating social and physical disengagement.
+                            - Younger age group (**~18 years**) with **low coursework pressure (0.44)** and **manageable stress levels**.
+                            - Mild presence of suicidal thoughts (**0.33**) suggests potential early warning signs.
+                            - Minimal isolation (**0.25**) — students are not disconnected, but may feel **unmotivated**.
+                
+                            **Summary:**  
+                            These students are socially and physically inactive, possibly due to emotional detachment or a lack of academic direction.
+                
+                            **Advice Focus:**
+                            - **Reconnect socially:** Join interest-based clubs or study groups to foster new friendships and a sense of belonging.
+                            - **Set gentle goals:** Rather than aiming for perfection, celebrate small achievements in your studies or social life.
+                            - **Practice self-kindness:** Avoid harsh self-criticism if you feel unmotivated; recognize that it’s okay to seek help and take breaks.
+                            - **Incorporate light activity:** Even easy movement like stretching or casual sports can support emotional health.
+                            - **Monitor mental signals:** If feelings of detachment or sadness persist, consider speaking with a mental health professional.
+                            """)
+                
+                    elif group_label == "Severe":
+                        if cluster_assignment == 1:
+                            st.markdown("""
+                            ### 🎯 *The Silent Perfectionist* – Severe Group
+                
+                            **Profile Insights:**
+                            - Extremely high coursework pressure (**0.78**) despite only moderate academic workload (**0.62**) — suggests **internalized pressure or perfectionism**.
+                            - **Less financial stress** — their stress likely comes from **self-imposed expectations**, not external hardship.
+                            - Slightly **better sleep quality (0.56)** and **lower suicidal thoughts (0.33)** than other severe groups — but signs may be **masked**.
+                            - Moderate levels of **co-curricular involvement** and **physical activity** — indicating **social participation**, but emotional weight remains.
+                
+                            **Summary:**  
+                            This group is high-functioning on the outside but battles **internal perfectionism** that silently impacts mental health.
+                
+                            **Advice Focus:**
+                            - **Challenge perfectionist thinking:** Remind yourself that making mistakes is part of growth. Practice self-compassion and avoid comparing yourself to others.
+                            - **Set realistic expectations:** Focus on progress, not perfection. Use “good enough” goals to reduce internal pressure.
+                            - **Care for your emotional health:** Schedule regular relaxation, creative hobbies, or social time to balance academic demands.
+                            - **Talk about your feelings:** Share concerns about self-imposed pressure with mentors, friends, or therapists—opening up can help lighten emotional burdens.
+                            - **Maintain healthy habits:** Continue physical activity and social engagement, but listen to your body and rest when needed.
+                            """)
+                
+                        elif cluster_assignment == 0:
+                            st.markdown("""
+                            ### 💢 *The Struggling Achiever* – Severe Group
+                
+                            **Profile Insights:**
+                            - High **academic workload (0.68)** and **coursework pressure (0.69)** — academic overload is intense.
+                            - Very low **sleep (0.47)** and **extremely high financial stress (1.00)** — signs of major life strain.
+                            - **High suicidal thoughts (0.32)** despite some participation in physical and co-curricular activities — may be masking severe distress.
+                            - Very young age (**~17–18 years old**) suggests difficulty adjusting to university-level challenges.
+                
+                            **Summary:**  
+                            These students are under severe academic, financial, and emotional stress and may be silently struggling.
+                
+                            **Advice Focus:**
+                            - **Seek immediate support:** Don’t hesitate to reach out to crisis counselors, hotlines, or mental health services if distress feels overwhelming.
+                            - **Establish a sleep routine:** Try to set a regular bedtime, limit screen time before bed, and create a calming nighttime ritual.
+                            - **Address financial worries:** Connect with student support services about financial aid, scholarships, or budgeting workshops to reduce stressors.
+                            - **Practice emotional check-ins:** Use mood tracking apps or daily reflection to recognize your emotional state and ask for help early.
+                            - **Balance workload:** Break tasks into manageable steps and allow yourself regular rest—your health comes first.
+                            """)
                     
                     # 💾 Save to database
                     user_id = get_user_id(st.session_state.username)  # Make sure username is stored in session_state
