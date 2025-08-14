@@ -1966,16 +1966,16 @@ elif st.session_state.page == "dashboard":
                 .medium { height: 8px; width: 8px; }
                 .small { height: 4px; width: 4px; }
             
-                .one { margin: -230px 0 0 20px; }
-                .two { margin: -290px 0 0 70px; }
-                .three { margin: -260px 0 0 130px; }
-                .four { margin: -280px 0 0 200px; }
-                .five { margin: -170px 0 0 16px; }
-                .six { margin: -270px 0 0 30px; }
-                .seven { margin: -240px 0 0 90px; }
-                .eight { margin: -288px 0 0 120px; }
+                .one { margin: -220px 0 0 20px; }
+                .two { margin: -280px 0 0 70px; }
+                .three { margin: -250px 0 0 130px; }
+                .four { margin: -270px 0 0 200px; }
+                .five { margin: -160px 0 0 16px; }
+                .six { margin: -260px 0 0 30px; }
+                .seven { margin: -230px 0 0 90px; }
+                .eight { margin: -278px 0 0 120px; }
                 .nine { margin: -290px 0 0 170px; }
-                .ten { margin: -230px 0 0 220px; }
+                .ten { margin: -220px 0 0 220px; }
             
                 @keyframes glow {
                   0% { box-shadow: 0 0 0 0 #fff; }
