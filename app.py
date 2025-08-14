@@ -1785,7 +1785,7 @@ elif st.session_state.page == "dashboard":
             
                 .big-basin {
                   position: relative;
-                  height: 350px;
+                  height: 330px;
                   width: 250px;
                   background: rgba(46, 63, 44, 1);
                   border: 14px solid #b6a17a;
@@ -1796,7 +1796,7 @@ elif st.session_state.page == "dashboard":
                 .trees-container {
                   position: absolute;
                   background: #334d63;
-                  height: 240px;
+                  height: 220px;
                   width: 230px;
                   overflow: hidden;
                 }
@@ -1938,7 +1938,7 @@ elif st.session_state.page == "dashboard":
                   position: relative;
                   margin: 230px 0 0 -10px;
                   height: 60px;
-                  width: 260px;
+                  width: 250px;
                   background: #b6a17a;
                   border-radius: 0 0 16px 16px;
                   text-align: center;
