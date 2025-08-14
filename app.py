@@ -914,11 +914,6 @@ elif st.session_state.page == "low_risk_modules":
             st.session_state.page = "dashboard"
             st.rerun()
 
-
-
-# --------------------------
-# HIGH RISK PATHWAY SECTION
-# --------------------------
 # --------------------------
 # HIGH RISK PATHWAY SECTION
 # --------------------------
@@ -1802,7 +1797,7 @@ elif st.session_state.page == "dashboard":
                   position: absolute;
                   background: #334d63;
                   height: 240px;
-                  width: 250px;
+                  width: 230px;
                   overflow: hidden;
                 }
             
@@ -1943,7 +1938,7 @@ elif st.session_state.page == "dashboard":
                   position: relative;
                   margin: 230px 0 0 -10px;
                   height: 60px;
-                  width: 270px;
+                  width: 260px;
                   background: #b6a17a;
                   border-radius: 0 0 16px 16px;
                   text-align: center;
@@ -1952,7 +1947,7 @@ elif st.session_state.page == "dashboard":
                 .banner h1 {
                   position: relative;
                   top: 10px;
-                  font-size: 1.5em;
+                  font-size: 1.3em;
                   font-weight: 700;
                   text-transform: uppercase;
                   color: #433825;
