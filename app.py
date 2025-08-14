@@ -1020,6 +1020,17 @@ elif st.session_state.page == "high_risk_pathway":
                     cocurricular, isolation, physical_activity,
                     sleep_hours, suicidal_binary, financial_stress, age
                 ]
+                # Store each input for later use
+                st.session_state.highrisk_age = age
+                st.session_state.highrisk_study_hours = study_hours
+                st.session_state.highrisk_academic_workload = academic_workload
+                st.session_state.highrisk_coursework_pressure = coursework_pressure
+                st.session_state.highrisk_sleep_hours = sleep_hours
+                st.session_state.highrisk_physical_activity = physical_activity
+                st.session_state.highrisk_isolation = isolation
+                st.session_state.highrisk_financial_stress = financial_stress
+                st.session_state.highrisk_cocurricular = cocurricular
+                st.session_state.highrisk_suicidal_binary = suicidal_binary
                 st.session_state.show_highrisk_results = True
                 st.rerun()
             except Exception as e:
@@ -1162,9 +1173,19 @@ elif st.session_state.page == "high_risk_pathway":
             user_id = get_user_id(st.session_state.username)  # Make sure username is stored in session_state
             if user_id:
                 save_high_risk_response(
-                    user_id, age, study_hours, coursework_pressure, academic_workload,
-                    sleep_hours, physical_activity, isolation, financial_stress,
-                    cocurricular, suicidal_binary, prediction, cluster_assignment
+                    user_id,
+                    st.session_state.highrisk_age,
+                    st.session_state.highrisk_study_hours,
+                    st.session_state.highrisk_coursework_pressure,
+                    st.session_state.highrisk_academic_workload,
+                    st.session_state.highrisk_sleep_hours,
+                    st.session_state.highrisk_physical_activity,
+                    st.session_state.highrisk_isolation,
+                    st.session_state.highrisk_financial_stress,
+                    st.session_state.highrisk_cocurricular,
+                    st.session_state.highrisk_suicidal_binary,
+                    prediction,
+                    cluster_assignment
                 )
                 st.success("🎉 Thanks for opening up, even when things are hard. You’re not alone in this — and support is just a click away. Together, we can start creating a healthier space for you.")
             else:
