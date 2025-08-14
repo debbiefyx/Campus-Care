@@ -1790,7 +1790,7 @@ elif st.session_state.page == "dashboard":
                   background: rgba(46, 63, 44, 1);
                   border: 14px solid #b6a17a;
                   border-radius: 10px 10px 140px 140px;
-                  margin: 20px auto 0 auto;
+                  margin: 10px auto 0 auto;
                 }
             
                 .trees-container {
@@ -1950,7 +1950,7 @@ elif st.session_state.page == "dashboard":
                   font-size: 1.3em;
                   font-weight: 700;
                   text-transform: uppercase;
-                  padding: 10px 10px 10px 10px;
+                  padding: 5px 5px 5px 5px;
                   color: #433825;
                   font-family: 'Ubuntu', sans-serif;
                   animation: fadein 2s ease-in;
