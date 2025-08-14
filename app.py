@@ -1796,7 +1796,7 @@ elif st.session_state.page == "dashboard":
                 .trees-container {
                   position: absolute;
                   background: #334d63;
-                  height: 220px;
+                  height: 240px;
                   width: 230px;
                   overflow: hidden;
                 }
@@ -1936,7 +1936,7 @@ elif st.session_state.page == "dashboard":
             
                 .banner {
                   position: relative;
-                  margin: 230px 0 0 -10px;
+                  margin: 210px 0 0 -10px;
                   height: 60px;
                   width: 250px;
                   background: #b6a17a;
