@@ -2032,29 +2032,88 @@ elif st.session_state.page == "dashboard":
             else:
                 st.markdown("""
                 <style>
-                .contributor-badge {
-                  width: 250px;
-                  background: linear-gradient(135deg, #BA68C8, #9575CD);
-                  color: white;
-                  font-weight: bold;
-                  padding: 20px;
-                  text-align: center;
-                  clip-path: polygon(0 0, 100% 10%, 100% 100%, 0 90%);
-                  font-size: 16px;
-                  margin: 20px auto;
-                  animation: slideIn 1s ease-in-out;
+                body {
+                  background: #8069a1;
+                  padding-top: 60px;
                 }
-    
-                @keyframes slideIn {
-                  from { transform: translateX(-20px); opacity: 0; }
-                  to { transform: translateX(0); opacity: 1; }
+                
+                svg {
+                  margin: auto;
+                  display: block;
+                }
+                
+                .badge * {
+                  transform-origin: 50% 50%;
+                }
+                
+                /* Default state without animation */
+                .outer, .inner, .inline, .star, .star circle {
+                  transform: scale(1);
+                  opacity: 1;
+                }
+                
+                /* Animations only when hovered */
+                .badge:hover .outer,
+                .badge:hover .inner,
+                .badge:hover .inline {
+                  animation: grow 1s ease-out;
+                }
+                
+                .badge:hover .star {
+                  animation: turn 1.1s ease-out;
+                }
+                
+                .badge:hover .star circle {
+                  animation: pulse 0.7s ease-in-out;
+                }
+                
+                .badge:hover .star circle:nth-of-type(2) { animation-delay: 0.1s; }
+                .badge:hover .star circle:nth-of-type(3) { animation-delay: 0.3s; }
+                .badge:hover .star circle:nth-of-type(4) { animation-delay: 0.5s; }
+                .badge:hover .star circle:nth-of-type(5) { animation-delay: 0.9s; }
+                
+                @keyframes grow {
+                  0%   { transform: scale(0); }
+                  30%  { transform: scale(1.1); }
+                  60%  { transform: scale(0.9); }
+                  100% { transform: scale(1); }
+                }
+                
+                @keyframes turn {
+                  0%   { transform: rotate(0) scale(0); opacity: 0; }
+                  60%  { transform: rotate(375deg) scale(1.1); }
+                  80%  { transform: rotate(355deg) scale(0.9); }
+                  100% { transform: rotate(360deg) scale(1); }
+                }
+                
+                @keyframes pulse {
+                  50% { transform: scale(1.4); }
                 }
                 </style>
-    
-                <div class="contributor-badge">
-                🔄 Mixed Journey Explorer
+                
+                <svg class="badge" xmlns="http://www.w3.org/2000/svg" height="250" width="250" viewBox="-40 -40 400 440">
+                  <circle class="outer" fill="#F9D535" stroke="#fff" stroke-width="8" stroke-linecap="round" cx="180" cy="180" r="157"/>
+                  <circle class="inner" fill="#DFB828" stroke="#fff" stroke-width="8" cx="180" cy="180" r="108.3"/>
+                  <path class="inline" d="M89.4 276.7c-26-24.2-42.2-58.8-42.2-97.1 0-22.6 5.6-43.8 15.5-62.4m234.7.1c9.9 18.6 15.4 39.7 15.4 62.2 0 38.3-16.2 72.8-42.1 97" stroke="#CAA61F" stroke-width="7" stroke-linecap="round" fill="none"/>
+                  <g class="star">
+                    <path fill="#F9D535" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" d="M180 107.8l16.9 52.1h54.8l-44.3 32.2 16.9 52.1-44.3-32.2-44.3 32.2 16.9-52.1-44.3-32.2h54.8z"/>
+                    <circle fill="#DFB828" stroke="#fff" stroke-width="4" cx="180" cy="107.8" r="4.4"/>
+                    <circle fill="#DFB828" stroke="#fff" stroke-width="4" cx="223.7" cy="244.2" r="4.4"/>
+                    <circle fill="#DFB828" stroke="#fff" stroke-width="4" cx="135.5" cy="244.2" r="4.4"/>
+                    <circle fill="#DFB828" stroke="#fff" stroke-width="4" cx="108.3" cy="160.4" r="4.4"/>
+                    <circle fill="#DFB828" stroke="#fff" stroke-width="4" cx="251.7" cy="160.4" r="4.4"/>
+                  </g>
+                </svg>
+                
+                <div style="text-align:center; font-size: 24px; font-weight: bold; color: black; margin-top: 10px;">
+                  🔄 Mixed Journey Explorer
+                </div>
+                
+                <div style="text-align:center; font-family: 'Segoe UI', sans-serif; font-size: 16px; margin-top: 10px; color: #222;">
+                  You have had both high and low risk check-ins, keep it up!
                 </div>
                 """, unsafe_allow_html=True)
+
 
     # 📝 Display Reflections
     with st.container():
