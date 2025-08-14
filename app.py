@@ -1786,7 +1786,7 @@ elif st.session_state.page == "dashboard":
                 .big-basin {
                   position: relative;
                   height: 330px;
-                  width: 250px;
+                  width: 255px;
                   background: rgba(46, 63, 44, 1);
                   border: 14px solid #b6a17a;
                   border-radius: 10px 10px 140px 140px;
