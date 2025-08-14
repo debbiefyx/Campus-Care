@@ -919,72 +919,84 @@ elif st.session_state.page == "low_risk_modules":
 # --------------------------
 # HIGH RISK PATHWAY SECTION
 # --------------------------
-elif st.session_state.page == "high_risk_pathway":
-    # Initialize the flag to control display of questions/results
-    if "show_highrisk_results" not in st.session_state:
-        st.session_state.show_highrisk_results = False
+# --------------------------
+# HIGH RISK PATHWAY SECTION
+# --------------------------
+elif st.session_state.page == "high_risk_pathway":        
+    with st.container():
 
-    model = joblib.load("log_stacking_model.pkl")
-    st.title("🔴 High-Risk Pathway")
-
-    # Only show the questions if results have not been analyzed yet
-    if not st.session_state.show_highrisk_results:
+        model = joblib.load("log_stacking_model.pkl")
+    
+        st.title("🔴 High-Risk Pathway")
         st.markdown("Kai: *Thanks for continuing this journey with me. These next questions will help me understand more about what you’re going through.*")
+    
+        # Likert scale legend
         st.markdown("""
         **Rate based on this scale:**
         😞 1 – None of the time | 😕 2 – Rarely | 😐 3 – Some of the time | 🙂 4 – Often | 😄 5 – All of the time
         """)
         st.markdown("---")
+    
         st.markdown("#### 🧑‍🎓 Scene 1: Let’s Start With You")
         with st.chat_message("assistant"):
             st.markdown("*How old are you, if you don't mind me asking?*")
         age = st.number_input("🎂 Your Age", min_value=16, max_value=30, step=1)
         st.markdown("---")
+    
         st.markdown("#### 📖 Scene 2: Academic Life Check-In")
         with st.chat_message("assistant"):
             st.markdown("*Uni life can be intense! On average, how many hours a week do you spend studying?*")
         study_hours = st.number_input("📘 Study Hours Per Week", min_value=0, max_value=100, step=1)
         st.markdown("---")
+    
         with st.chat_message("assistant"):
             st.markdown("*If you had to describe your academic workload, what would it be?*")
         academic_workload = st.slider("📈 Academic Workload", 1, 5, 3, format="%d")
         st.markdown("---")
+    
         with st.chat_message("assistant"):
             st.markdown("*Do you often feel pressured by your coursework?*")
         coursework_pressure = st.slider("📝 Coursework Pressure", 1, 5, 3, format="%d")
         st.markdown("---")
+    
         st.markdown("#### 💰 Scene 3: Finances & You")
         with st.chat_message("assistant"):
             st.markdown("*Do money issues often add to your stress?*")
         financial_stress = st.slider("💵 Financial Stress", 1, 5, 3, format="%d")
         st.markdown("---")
+    
         st.markdown("#### 💤 Scene 4: Sleep Habits")
         with st.chat_message("assistant"):
             st.markdown("*Let’s talk sleep. On average, how many hours do you get each night?*")
         sleep_hours = st.number_input("🌙 Sleep Hours Per Night", min_value=0.0, max_value=12.0, step=0.5)
         st.markdown("---")
+    
         st.markdown("#### 🏃 Scene 5: Staying Active")
         with st.chat_message("assistant"):
             st.markdown("*How often do you get moving — like exercising, walking, or stretching?*")
         physical_activity = st.slider("🏋️‍♀️ Physical Activity Frequency", 1, 5, 3, format="%d")
         st.markdown("---")
+    
         st.markdown("#### 👥 Scene 6: Social Life")
         with st.chat_message("assistant"):
             st.markdown("*Are you involved in clubs, societies, or volunteering?*")
         cocurricular = st.slider("🎭 Co-Curricular Involvement", 1, 5, 3, format="%d")
         st.markdown("---")
+    
         with st.chat_message("assistant"):
             st.markdown("*Do you often feel isolated or disconnected from your peers?*")
         isolation = st.slider("🕳️ Isolation Frequency", 1, 5, 3, format="%d")
         st.markdown("---")
+    
         st.markdown("#### 🚨 Scene 7: Mental Health Moments")
         with st.chat_message("assistant"):
             st.markdown("*In the past 2 weeks, have you had any thoughts of hurting yourself?*")
         suicidal_thoughts = st.radio("💭 Recent Suicidal Thoughts", ["No", "Yes"])
         suicidal_binary = 1 if suicidal_thoughts == "Yes" else 0
+    
         st.markdown("---")
 
-        # Prepare data for prediction
+        # Ensure correct order
         input_dict = {
             "Age": age,
             "Study_Hours_Per_Week": study_hours,
@@ -997,6 +1009,8 @@ elif st.session_state.page == "high_risk_pathway":
             "Isolation_Frequency": isolation,
             "Recent_Suicidal_Thoughts": suicidal_binary
         }
+        
+        # Convert to dataframe with correct column order
         input_df = pd.DataFrame([input_dict])[[
             "Age",
             "Study_Hours_Per_Week",
@@ -1010,192 +1024,176 @@ elif st.session_state.page == "high_risk_pathway":
             "Recent_Suicidal_Thoughts"
         ]]
 
-        # Analysis button
         if st.button("🔎 Analyze My Mental Risk Level"):
             try:
                 prediction = model.predict(input_df)[0]
-                st.session_state.highrisk_prediction = prediction
-                st.session_state.highrisk_user_vector = [
-                    coursework_pressure, study_hours, academic_workload,
-                    cocurricular, isolation, physical_activity,
-                    sleep_hours, suicidal_binary, financial_stress, age
-                ]
-                # Store each input for later use
-                st.session_state.highrisk_age = age
-                st.session_state.highrisk_study_hours = study_hours
-                st.session_state.highrisk_academic_workload = academic_workload
-                st.session_state.highrisk_coursework_pressure = coursework_pressure
-                st.session_state.highrisk_sleep_hours = sleep_hours
-                st.session_state.highrisk_physical_activity = physical_activity
-                st.session_state.highrisk_isolation = isolation
-                st.session_state.highrisk_financial_stress = financial_stress
-                st.session_state.highrisk_cocurricular = cocurricular
-                st.session_state.highrisk_suicidal_binary = suicidal_binary
-                st.session_state.show_highrisk_results = True
-                st.rerun()
+    
+                st.markdown("## 📊 Kai’s Check-In Result")
+                if prediction == 0:
+                    st.success("🟢 Minimal to Mild Risk\nKai: *You're showing early signs, but you're managing well. Keep checking in with yourself!*")
+                    st.info("Redirecting you to the Low-Risk Wellness Pathway for encouragement and growth tips.")
+                    time.sleep(5)
+                    st.session_state.page = "low_risk_pathway"
+                    st.rerun()
+                elif prediction == 1:
+                    st.warning("🟠 Moderate Risk\nKai: *There are some warning signs. You might benefit from support circles or peer check-ins.*")
+                elif prediction == 2:
+                    st.error("🔴 Severe Risk\nKai: *I'm concerned about your well-being. Please know that you're not alone. Let’s explore support options together.*")
+
+                if prediction in [1, 2]:
+                    # Prepare unnormalized vector for cluster assignment
+                    user_vector = [
+                        coursework_pressure, study_hours, academic_workload,
+                        cocurricular, isolation, physical_activity,
+                        sleep_hours, suicidal_binary, financial_stress, age
+                    ]
+                    
+                    # Determine group label
+                    group_label = "Moderate" if prediction == 1 else "Severe"
+                    
+                    # Assign to nearest cluster
+                    cluster_assignment = assign_cluster(user_vector, group_label)
+
+                    cluster_profiles = pd.read_csv("all_cluster_profiles.csv")
+                    cluster_data = cluster_profiles[
+                        (cluster_profiles["Cluster"] == cluster_assignment) & (cluster_profiles["Group"] == group_label)
+                    ]
+
+                    # Extract cluster name (make sure it's in your CSV)
+                    cluster_name = cluster_data["Cluster_Name"].values[0]
+
+                    st.info(f"📌 Assigned to Cluster: {cluster_assignment} ({group_label})")
+    
+                    # ----------------------------
+                    #    RADAR CHART + INSIGHTS 
+                    # ----------------------------
+                    radar_features = [
+                        "Coursework_Pressure", "Study_Hours_Per_Week", "Academic_Workload", "CoCurricular_Involvement",
+                        "Isolation_Frequency", "Physical_Activity_Freq", "Sleep_Hours_Per_Night",
+                        "Recent_Suicidal_Thoughts", "Financial_Stress", "Age"
+                    ]
+                    fig = go.Figure()
+                    fig.add_trace(go.Scatterpolar(
+                        r=cluster_data[radar_features].values.flatten(),
+                        theta=radar_features,
+                        fill='toself',
+                        name=f"Cluster {cluster_assignment}"
+                    ))
+                    fig.update_layout(
+                        polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
+                        showlegend=False,
+                        title=f"🧭 Profile Radar: Cluster {cluster_name} ({group_label})"
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
+                    
+                    # Profile Insights
+                    if group_label == "Moderate":
+                        if cluster_assignment == 0:
+                            st.markdown("""
+                            ### 🌀 *The Overwhelmed Balancer* – Moderate Group
+                    
+                            **Profile Insights:**
+                            - High coursework pressure despite a moderate academic workload and low study hours — possibly due to procrastination or poor stress coping.
+                            - Moderate involvement in co-curricular activities and physical activity — trying to stay balanced.
+                            - Noticeable financial stress and early signs of emotional vulnerability (such as thoughts of self-harm).
+                            - Typically around age 20–21, possibly facing academic transition stress.
+                    
+                            **Summary:**  
+                            This group may struggle with time management and emotional stress despite a manageable workload.
+                    
+                            **Advice Focus:**
+                            - **Prioritize mental well-being:** Set aside regular time for relaxation and self-reflection. Practice mindful breathing or meditation to reduce anxiety from coursework pressure.
+                            - **Build supportive routines:** Structure your day with small, achievable goals for study and breaks. Use planners or habit trackers to visualize progress.
+                            - **Reach out for help:** Share your feelings about stress with trusted friends, family, or campus counselors. Early support can prevent escalation.
+                            - **Try resilience-building activities:** Journaling, gratitude exercises, and positive self-affirmations can help reframe negative thoughts and boost emotional strength.
+                            - **Stay active:** Moderate exercise, even short walks, can improve mood and energy.
+                            """)
+                    
+                        elif cluster_assignment == 1:
+                            st.markdown("""
+                            ### 🌫️ *The Drifting Observer* – Moderate Group
+                    
+                            **Profile Insights:**
+                            - Lowest co-curricular involvement and physical activity — indicating social and physical disengagement.
+                            - Younger age group (often around 18 years) with low coursework pressure and generally manageable stress levels.
+                            - Mild presence of emotional distress, such as early warning signs of self-harm thoughts.
+                            - Minimal isolation — students are not disconnected, but may feel unmotivated.
+                    
+                            **Summary:**  
+                            These students are socially and physically inactive, possibly due to emotional detachment or a lack of academic direction.
+                    
+                            **Advice Focus:**
+                            - **Reconnect socially:** Join interest-based clubs or study groups to foster new friendships and a sense of belonging.
+                            - **Set gentle goals:** Rather than aiming for perfection, celebrate small achievements in your studies or social life.
+                            - **Practice self-kindness:** Avoid harsh self-criticism if you feel unmotivated; recognize that it’s okay to seek help and take breaks.
+                            - **Incorporate light activity:** Even easy movement like stretching or casual sports can support emotional health.
+                            - **Monitor mental signals:** If feelings of detachment or sadness persist, consider speaking with a mental health professional.
+                            """)
+                    
+                    elif group_label == "Severe":
+                        if cluster_assignment == 1:
+                            st.markdown("""
+                            ### 🎯 *The Silent Perfectionist* – Severe Group
+                    
+                            **Profile Insights:**
+                            - Extremely high coursework pressure despite only moderate academic workload — suggests internalized pressure or perfectionism.
+                            - Lower financial stress — stress likely comes from self-imposed expectations, not external hardship.
+                            - Slightly better sleep quality and lower emotional distress than other severe groups — but signs may be masked.
+                            - Moderate levels of co-curricular involvement and physical activity — indicating social participation, but emotional weight remains.
+                    
+                            **Summary:**  
+                            This group is high-functioning on the outside but battles internal perfectionism that silently impacts mental health.
+                    
+                            **Advice Focus:**
+                            - **Challenge perfectionist thinking:** Remind yourself that making mistakes is part of growth. Practice self-compassion and avoid comparing yourself to others.
+                            - **Set realistic expectations:** Focus on progress, not perfection. Use “good enough” goals to reduce internal pressure.
+                            - **Care for your emotional health:** Schedule regular relaxation, creative hobbies, or social time to balance academic demands.
+                            - **Talk about your feelings:** Share concerns about self-imposed pressure with mentors, friends, or therapists—opening up can help lighten emotional burdens.
+                            - **Maintain healthy habits:** Continue physical activity and social engagement, but listen to your body and rest when needed.
+                            """)
+                    
+                        elif cluster_assignment == 0:
+                            st.markdown("""
+                            ### 💢 *The Struggling Achiever* – Severe Group
+                    
+                            **Profile Insights:**
+                            - High academic workload and coursework pressure — academic overload is intense.
+                            - Very low sleep and extremely high financial stress — signs of major life strain.
+                            - High emotional distress despite some participation in physical and co-curricular activities — may be masking severe distress.
+                            - Very young age (often around 17–18 years old) suggests difficulty adjusting to university-level challenges.
+                    
+                            **Summary:**  
+                            These students are under severe academic, financial, and emotional stress and may be silently struggling.
+                    
+                            **Advice Focus:**
+                            - **Seek immediate support:** Don’t hesitate to reach out to crisis counselors, hotlines, or mental health services if distress feels overwhelming.
+                            - **Establish a sleep routine:** Try to set a regular bedtime, limit screen time before bed, and create a calming nighttime ritual.
+                            - **Address financial worries:** Connect with student support services about financial aid, scholarships, or budgeting workshops to reduce stressors.
+                            - **Practice emotional check-ins:** Use mood tracking apps or daily reflection to recognize your emotional state and ask for help early.
+                            - **Balance workload:** Break tasks into manageable steps and allow yourself regular rest—your health comes first.
+                            """)
+                    
+                    # 💾 Save to database
+                    user_id = get_user_id(st.session_state.username)  # Make sure username is stored in session_state
+                    if user_id:
+                        save_high_risk_response(
+                            user_id, age, study_hours, coursework_pressure, academic_workload,
+                            sleep_hours, physical_activity, isolation, financial_stress,
+                            cocurricular, suicidal_binary, prediction, cluster_assignment
+                        )
+
+                        st.success("🎉 Thanks for opening up, even when things are hard. You’re not alone in this — and support is just a click away. Together, we can start creating a healthier space for you.")
+                        
+                    else:
+                        st.warning("⚠️ Could not save response. User not found.")
+                    
             except Exception as e:
-                st.error("Error analyzing risk level. Please try again.")
-
-    else:
-        # Only show results, not questions
-        prediction = st.session_state.highrisk_prediction
-        user_vector = st.session_state.highrisk_user_vector
-
-        st.markdown("## 📊 Kai’s Check-In Result")
-        if prediction == 0:
-            st.success("🟢 Minimal to Mild Risk\nKai: *You're showing early signs, but you're managing well. Keep checking in with yourself!*")
-            st.info("Redirecting you to the Low-Risk Wellness Pathway for encouragement and growth tips.")
-            time.sleep(3)
-            st.session_state.page = "low_risk_pathway"
-            st.session_state.show_highrisk_results = False  # Reset for future use
-            st.rerun()
-        elif prediction == 1:
-            st.warning("🟠 Moderate Risk\nKai: *There are some warning signs. You might benefit from support circles or peer check-ins.*")
-        elif prediction == 2:
-            st.error("🔴 Severe Risk\nKai: *I'm concerned about your well-being. Please know that you're not alone. Let’s explore support options together.*")
-
-        if prediction in [1, 2]:
-            # Prepare cluster assignment and insights
-            group_label = "Moderate" if prediction == 1 else "Severe"
-            cluster_assignment = assign_cluster(user_vector, group_label)
-            cluster_profiles = pd.read_csv("all_cluster_profiles.csv")
-            cluster_data = cluster_profiles[
-                (cluster_profiles["Cluster"] == cluster_assignment) & (cluster_profiles["Group"] == group_label)
-            ]
-            cluster_name = cluster_data["Cluster_Name"].values[0]
-            st.info(f"📌 Assigned to Cluster: {cluster_assignment} ({group_label})")
-
-            # Radar chart
-            radar_features = [
-                "Coursework_Pressure", "Study_Hours_Per_Week", "Academic_Workload", "CoCurricular_Involvement",
-                "Isolation_Frequency", "Physical_Activity_Freq", "Sleep_Hours_Per_Night",
-                "Recent_Suicidal_Thoughts", "Financial_Stress", "Age"
-            ]
-            fig = go.Figure()
-            fig.add_trace(go.Scatterpolar(
-                r=cluster_data[radar_features].values.flatten(),
-                theta=radar_features,
-                fill='toself',
-                name=f"Cluster {cluster_assignment}"
-            ))
-            fig.update_layout(
-                polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
-                showlegend=False,
-                title=f"🧭 Profile Radar: Cluster {cluster_name} ({group_label})"
-            )
-            st.plotly_chart(fig, use_container_width=True)
-
-            # Profile Insights
-            if group_label == "Moderate":
-                if cluster_assignment == 0:
-                    st.markdown("""
-                    ### 🌀 *The Overwhelmed Balancer* – Moderate Group
-
-                    **Profile Insights:**
-                    - High coursework pressure despite a moderate academic workload and low study hours — possibly due to procrastination or poor stress coping.
-                    - Moderate involvement in co-curricular activities and physical activity — trying to stay balanced.
-                    - Noticeable financial stress and early signs of emotional vulnerability (such as thoughts of self-harm).
-                    - Typically around age 20–21, possibly facing academic transition stress.
-
-                    **Summary:**  
-                    This group may struggle with time management and emotional stress despite a manageable workload.
-
-                    **Advice Focus:**
-                    - **Prioritize mental well-being:** Set aside regular time for relaxation and self-reflection. Practice mindful breathing or meditation to reduce anxiety from coursework pressure.
-                    - **Build supportive routines:** Structure your day with small, achievable goals for study and breaks. Use planners or habit trackers to visualize progress.
-                    - **Reach out for help:** Share your feelings about stress with trusted friends, family, or campus counselors. Early support can prevent escalation.
-                    - **Try resilience-building activities:** Journaling, gratitude exercises, and positive self-affirmations can help reframe negative thoughts and boost emotional strength.
-                    - **Stay active:** Moderate exercise, even short walks, can improve mood and energy.
-                    """)
-                elif cluster_assignment == 1:
-                    st.markdown("""
-                    ### 🌫️ *The Drifting Observer* – Moderate Group
-
-                    **Profile Insights:**
-                    - Lowest co-curricular involvement and physical activity — indicating social and physical disengagement.
-                    - Younger age group (often around 18 years) with low coursework pressure and generally manageable stress levels.
-                    - Mild presence of emotional distress, such as early warning signs of self-harm thoughts.
-                    - Minimal isolation — students are not disconnected, but may feel unmotivated.
-
-                    **Summary:**  
-                    These students are socially and physically inactive, possibly due to emotional detachment or a lack of academic direction.
-
-                    **Advice Focus:**
-                    - **Reconnect socially:** Join interest-based clubs or study groups to foster new friendships and a sense of belonging.
-                    - **Set gentle goals:** Rather than aiming for perfection, celebrate small achievements in your studies or social life.
-                    - **Practice self-kindness:** Avoid harsh self-criticism if you feel unmotivated; recognize that it’s okay to seek help and take breaks.
-                    - **Incorporate light activity:** Even easy movement like stretching or casual sports can support emotional health.
-                    - **Monitor mental signals:** If feelings of detachment or sadness persist, consider speaking with a mental health professional.
-                    """)
-            elif group_label == "Severe":
-                if cluster_assignment == 1:
-                    st.markdown("""
-                    ### 🎯 *The Silent Perfectionist* – Severe Group
-
-                    **Profile Insights:**
-                    - Extremely high coursework pressure despite only moderate academic workload — suggests internalized pressure or perfectionism.
-                    - Lower financial stress — stress likely comes from self-imposed expectations, not external hardship.
-                    - Slightly better sleep quality and lower emotional distress than other severe groups — but signs may be masked.
-                    - Moderate levels of co-curricular involvement and physical activity — indicating social participation, but emotional weight remains.
-
-                    **Summary:**  
-                    This group is high-functioning on the outside but battles internal perfectionism that silently impacts mental health.
-
-                    **Advice Focus:**
-                    - **Challenge perfectionist thinking:** Remind yourself that making mistakes is part of growth. Practice self-compassion and avoid comparing yourself to others.
-                    - **Set realistic expectations:** Focus on progress, not perfection. Use “good enough” goals to reduce internal pressure.
-                    - **Care for your emotional health:** Schedule regular relaxation, creative hobbies, or social time to balance academic demands.
-                    - **Talk about your feelings:** Share concerns about self-imposed pressure with mentors, friends, or therapists—opening up can help lighten emotional burdens.
-                    - **Maintain healthy habits:** Continue physical activity and social engagement, but listen to your body and rest when needed.
-                    """)
-                elif cluster_assignment == 0:
-                    st.markdown("""
-                    ### 💢 *The Struggling Achiever* – Severe Group
-
-                    **Profile Insights:**
-                    - High academic workload and coursework pressure — academic overload is intense.
-                    - Very low sleep and extremely high financial stress — signs of major life strain.
-                    - High emotional distress despite some participation in physical and co-curricular activities — may be masking severe distress.
-                    - Very young age (often around 17–18 years old) suggests difficulty adjusting to university-level challenges.
-
-                    **Summary:**  
-                    These students are under severe academic, financial, and emotional stress and may be silently struggling.
-
-                    **Advice Focus:**
-                    - **Seek immediate support:** Don’t hesitate to reach out to crisis counselors, hotlines, or mental health services if distress feels overwhelming.
-                    - **Establish a sleep routine:** Try to set a regular bedtime, limit screen time before bed, and create a calming nighttime ritual.
-                    - **Address financial worries:** Connect with student support services about financial aid, scholarships, or budgeting workshops to reduce stressors.
-                    - **Practice emotional check-ins:** Use mood tracking apps or daily reflection to recognize your emotional state and ask for help early.
-                    - **Balance workload:** Break tasks into manageable steps and allow yourself regular rest—your health comes first.
-                    """)
-
-            # 💾 Save to database
-            user_id = get_user_id(st.session_state.username)  # Make sure username is stored in session_state
-            if user_id:
-                save_high_risk_response(
-                    user_id,
-                    st.session_state.highrisk_age,
-                    st.session_state.highrisk_study_hours,
-                    st.session_state.highrisk_coursework_pressure,
-                    st.session_state.highrisk_academic_workload,
-                    st.session_state.highrisk_sleep_hours,
-                    st.session_state.highrisk_physical_activity,
-                    st.session_state.highrisk_isolation,
-                    st.session_state.highrisk_financial_stress,
-                    st.session_state.highrisk_cocurricular,
-                    st.session_state.highrisk_suicidal_binary,
-                    prediction,
-                    cluster_assignment
-                )
-                st.success("🎉 Thanks for opening up, even when things are hard. You’re not alone in this — and support is just a click away. Together, we can start creating a healthier space for you.")
-            else:
-                st.warning("⚠️ Could not save response. User not found.")
+                st.error(f"Prediction failed: {e}")
 
         st.markdown("")
         st.markdown("---")
         if st.button("🚀 Go to Dashboard"):
             st.session_state.page = "dashboard"
-            st.session_state.show_highrisk_results = False  # Reset flag for next entry
             st.rerun()
 
 # -----------------
