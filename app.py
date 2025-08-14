@@ -60,18 +60,41 @@ def hash_password(password):
 def verify_password(stored_password, provided_password):
     return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password)
     
+# def get_user_id(username):
+#     conn = get_db_connection()
+#     with conn:
+#         with conn.cursor() as cursor:
+#             cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
+#             row = cursor.fetchone()
+#             return row["id"] if row else None
+
 def get_user_id(username):
     conn = get_db_connection()
-    with conn:
+    try:
         with conn.cursor() as cursor:
             cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
             row = cursor.fetchone()
             return row["id"] if row else None
+    finally:
+        conn.close()
 
 # Also fix validate_user to avoid double-encoding bytes from VARBINARY:
+# def validate_user(username, password):
+#     conn = get_db_connection()
+#     with conn:
+#         with conn.cursor() as cursor:
+#             cursor.execute("SELECT password FROM users WHERE username = %s", (username,))
+#             row = cursor.fetchone()
+#             if row:
+#                 stored_password = row["password"]
+#                 if isinstance(stored_password, str):
+#                     stored_password = stored_password.encode("utf-8")
+#                 return bcrypt.checkpw(password.encode("utf-8"), stored_password)
+#     return False
+
 def validate_user(username, password):
     conn = get_db_connection()
-    with conn:
+    try:
         with conn.cursor() as cursor:
             cursor.execute("SELECT password FROM users WHERE username = %s", (username,))
             row = cursor.fetchone()
@@ -80,19 +103,35 @@ def validate_user(username, password):
                 if isinstance(stored_password, str):
                     stored_password = stored_password.encode("utf-8")
                 return bcrypt.checkpw(password.encode("utf-8"), stored_password)
-    return False
+        return False
+    finally:
+        conn.close()
+
+# def create_user(username, password):
+#     conn = get_db_connection()
+#     with conn:
+#         with conn.cursor() as cursor:
+#             cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
+#             if cursor.fetchone():
+#                 return False  
+#             hashed_password = hash_password(password)
+#             cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
+#         conn.commit()
+#     return True
 
 def create_user(username, password):
     conn = get_db_connection()
-    with conn:
+    try:
         with conn.cursor() as cursor:
             cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
             if cursor.fetchone():
-                return False  
+                return False
             hashed_password = hash_password(password)
             cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
         conn.commit()
-    return True
+        return True
+    finally:
+        conn.close()
 
 def assign_cluster(user_vector, group_label):
     df = pd.read_csv("all_cluster_profiles.csv")
@@ -121,11 +160,126 @@ def assign_cluster(user_vector, group_label):
     min_idx = np.argmin(distances)
     return int(df_group.iloc[min_idx]["Cluster"])
 
+# def save_high_risk_response(user_id, age, study_hours, coursework_pressure, academic_workload,
+#                              sleep_hours, physical_activity, isolation, financial_stress,
+#                              cocurricular, suicidal_binary, prediction_result, cluster):
+#     conn = get_db_connection()
+#     with conn:
+#         with conn.cursor() as cursor:
+#             query = """
+#                 INSERT INTO high_risk_responses (
+#                     user_id, age, study_hours, coursework_pressure, academic_workload,
+#                     sleep_hours, physical_activity, isolation, financial_stress,
+#                     cocurricular, suicidal_thoughts, prediction_result, cluster
+#                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+#             """
+#             cursor.execute(query, (
+#                 user_id, age, study_hours, coursework_pressure, academic_workload,
+#                 sleep_hours, physical_activity, isolation, financial_stress,
+#                 cocurricular, suicidal_binary, prediction_result, cluster
+#             ))
+#         conn.commit()
+
+# def save_self_check_visit(user_id, total_score, risk_level):
+#     conn = get_db_connection()
+#     with conn:
+#         with conn.cursor() as cursor:
+#             cursor.execute("""
+#                 INSERT INTO self_check_logs (user_id, score, risk_level)
+#                 VALUES (%s, %s, %s)
+#             """, (user_id, total_score, risk_level))
+#         conn.commit()
+
+# def get_self_check_stats(user_id):
+#     conn = get_db_connection()
+#     with conn:
+#         with conn.cursor() as cursor:
+#             cursor.execute("SELECT COUNT(*) AS count FROM self_check_logs WHERE user_id = %s", (user_id,))
+#             total_row = cursor.fetchone()
+#             print("Total row returned:", total_row)
+#             total = total_row["count"] if total_row else 0
+
+#             cursor.execute("""
+#                 SELECT COUNT(*) AS count FROM self_check_logs 
+#                 WHERE user_id = %s AND risk_level = 'Low'
+#             """, (user_id,))
+#             low_row = cursor.fetchone()
+#             low = low_row["count"] if low_row else 0
+
+#             cursor.execute("""
+#                 SELECT COUNT(*) AS count FROM self_check_logs 
+#                 WHERE user_id = %s AND risk_level = 'High'
+#             """, (user_id,))
+#             high_row = cursor.fetchone()
+#             high = high_row["count"] if high_row else 0
+
+#     return total, low, high
+
+# def get_recent_clusters(user_id):
+#     cluster_df = pd.read_csv("all_cluster_profiles.csv")
+
+#     # Build a lookup: {(group_label, cluster_num): (friendly_name, description)}
+#     cluster_info = {}
+#     for _, row in cluster_df.iterrows():
+#         group_label = row["Group"]
+#         cluster_num = int(row["Cluster"])
+#         friendly_name = row.get("Cluster_Name", f"{group_label} Cluster {cluster_num}")
+#         description = row.get("Cluster_Description", "No description provided.")
+#         cluster_info[(group_label, cluster_num)] = (friendly_name, description)
+
+#     recent_clusters = []
+
+#     # Query the two most recent high-risk responses
+#     conn = get_db_connection()
+#     with conn:
+#         with conn.cursor(cursor=DictCursor) as cursor:
+#             cursor.execute("""
+#                 SELECT cluster, prediction_result, submitted_at 
+#                 FROM high_risk_responses 
+#                 WHERE user_id = %s 
+#                 ORDER BY submitted_at DESC 
+#                 LIMIT 2
+#             """, (user_id,))
+#             results = cursor.fetchall()
+
+#     for row in results:
+#         cluster_num = int(row["cluster"])
+#         pred_result = row["prediction_result"]
+#         date_str = row["submitted_at"].strftime("%Y-%m-%d")
+
+#         # Map prediction_result to group name
+#         group = (
+#             "Moderate" if pred_result == 1 else
+#             "Severe" if pred_result == 2 else
+#             "Mild"
+#         )
+
+#         # Get custom name and description
+#         friendly_name, description = cluster_info.get((group, cluster_num), (f"{group} – Cluster {cluster_num}", "No description available."))
+
+#         recent_clusters.append({
+#             "label": friendly_name,
+#             "date": date_str,
+#             "description": description
+#         })
+
+#     return recent_clusters
+
+# def save_reflection(user_id, module_name, reflection):
+#     conn = get_db_connection()
+#     with conn:
+#         with conn.cursor() as cursor:
+#             cursor.execute("""
+#                 INSERT INTO user_reflections (user_id, module_name, reflection)
+#                 VALUES (%s, %s, %s)
+#             """, (user_id, module_name, reflection))
+#         conn.commit()
+
 def save_high_risk_response(user_id, age, study_hours, coursework_pressure, academic_workload,
                              sleep_hours, physical_activity, isolation, financial_stress,
                              cocurricular, suicidal_binary, prediction_result, cluster):
     conn = get_db_connection()
-    with conn:
+    try:
         with conn.cursor() as cursor:
             query = """
                 INSERT INTO high_risk_responses (
@@ -140,20 +294,24 @@ def save_high_risk_response(user_id, age, study_hours, coursework_pressure, acad
                 cocurricular, suicidal_binary, prediction_result, cluster
             ))
         conn.commit()
+    finally:
+        conn.close()
 
 def save_self_check_visit(user_id, total_score, risk_level):
     conn = get_db_connection()
-    with conn:
+    try:
         with conn.cursor() as cursor:
             cursor.execute("""
                 INSERT INTO self_check_logs (user_id, score, risk_level)
                 VALUES (%s, %s, %s)
             """, (user_id, total_score, risk_level))
         conn.commit()
+    finally:
+        conn.close()
 
 def get_self_check_stats(user_id):
     conn = get_db_connection()
-    with conn:
+    try:
         with conn.cursor() as cursor:
             cursor.execute("SELECT COUNT(*) AS count FROM self_check_logs WHERE user_id = %s", (user_id,))
             total_row = cursor.fetchone()
@@ -174,7 +332,9 @@ def get_self_check_stats(user_id):
             high_row = cursor.fetchone()
             high = high_row["count"] if high_row else 0
 
-    return total, low, high
+        return total, low, high
+    finally:
+        conn.close()
 
 def get_recent_clusters(user_id):
     cluster_df = pd.read_csv("all_cluster_profiles.csv")
@@ -190,9 +350,8 @@ def get_recent_clusters(user_id):
 
     recent_clusters = []
 
-    # Query the two most recent high-risk responses
     conn = get_db_connection()
-    with conn:
+    try:
         with conn.cursor(cursor=DictCursor) as cursor:
             cursor.execute("""
                 SELECT cluster, prediction_result, submitted_at 
@@ -202,20 +361,20 @@ def get_recent_clusters(user_id):
                 LIMIT 2
             """, (user_id,))
             results = cursor.fetchall()
+    finally:
+        conn.close()
 
     for row in results:
         cluster_num = int(row["cluster"])
         pred_result = row["prediction_result"]
         date_str = row["submitted_at"].strftime("%Y-%m-%d")
 
-        # Map prediction_result to group name
         group = (
             "Moderate" if pred_result == 1 else
             "Severe" if pred_result == 2 else
             "Mild"
         )
 
-        # Get custom name and description
         friendly_name, description = cluster_info.get((group, cluster_num), (f"{group} – Cluster {cluster_num}", "No description available."))
 
         recent_clusters.append({
@@ -228,14 +387,15 @@ def get_recent_clusters(user_id):
 
 def save_reflection(user_id, module_name, reflection):
     conn = get_db_connection()
-    with conn:
+    try:
         with conn.cursor() as cursor:
             cursor.execute("""
                 INSERT INTO user_reflections (user_id, module_name, reflection)
                 VALUES (%s, %s, %s)
             """, (user_id, module_name, reflection))
         conn.commit()
-
+    finally:
+        conn.close()
 
 # ────────────────────────────────
 # Streamlit Session & UI Setup
