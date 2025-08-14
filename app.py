@@ -59,14 +59,6 @@ def hash_password(password):
 
 def verify_password(stored_password, provided_password):
     return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password)
-    
-# def get_user_id(username):
-#     conn = get_db_connection()
-#     with conn:
-#         with conn.cursor() as cursor:
-#             cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
-#             row = cursor.fetchone()
-#             return row["id"] if row else None
 
 def get_user_id(username):
     conn = get_db_connection()
@@ -77,20 +69,6 @@ def get_user_id(username):
             return row["id"] if row else None
     finally:
         conn.close()
-
-# Also fix validate_user to avoid double-encoding bytes from VARBINARY:
-# def validate_user(username, password):
-#     conn = get_db_connection()
-#     with conn:
-#         with conn.cursor() as cursor:
-#             cursor.execute("SELECT password FROM users WHERE username = %s", (username,))
-#             row = cursor.fetchone()
-#             if row:
-#                 stored_password = row["password"]
-#                 if isinstance(stored_password, str):
-#                     stored_password = stored_password.encode("utf-8")
-#                 return bcrypt.checkpw(password.encode("utf-8"), stored_password)
-#     return False
 
 def validate_user(username, password):
     conn = get_db_connection()
@@ -106,18 +84,6 @@ def validate_user(username, password):
         return False
     finally:
         conn.close()
-
-# def create_user(username, password):
-#     conn = get_db_connection()
-#     with conn:
-#         with conn.cursor() as cursor:
-#             cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
-#             if cursor.fetchone():
-#                 return False  
-#             hashed_password = hash_password(password)
-#             cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password))
-#         conn.commit()
-#     return True
 
 def create_user(username, password):
     conn = get_db_connection()
@@ -160,120 +126,6 @@ def assign_cluster(user_vector, group_label):
     min_idx = np.argmin(distances)
     return int(df_group.iloc[min_idx]["Cluster"])
 
-# def save_high_risk_response(user_id, age, study_hours, coursework_pressure, academic_workload,
-#                              sleep_hours, physical_activity, isolation, financial_stress,
-#                              cocurricular, suicidal_binary, prediction_result, cluster):
-#     conn = get_db_connection()
-#     with conn:
-#         with conn.cursor() as cursor:
-#             query = """
-#                 INSERT INTO high_risk_responses (
-#                     user_id, age, study_hours, coursework_pressure, academic_workload,
-#                     sleep_hours, physical_activity, isolation, financial_stress,
-#                     cocurricular, suicidal_thoughts, prediction_result, cluster
-#                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-#             """
-#             cursor.execute(query, (
-#                 user_id, age, study_hours, coursework_pressure, academic_workload,
-#                 sleep_hours, physical_activity, isolation, financial_stress,
-#                 cocurricular, suicidal_binary, prediction_result, cluster
-#             ))
-#         conn.commit()
-
-# def save_self_check_visit(user_id, total_score, risk_level):
-#     conn = get_db_connection()
-#     with conn:
-#         with conn.cursor() as cursor:
-#             cursor.execute("""
-#                 INSERT INTO self_check_logs (user_id, score, risk_level)
-#                 VALUES (%s, %s, %s)
-#             """, (user_id, total_score, risk_level))
-#         conn.commit()
-
-# def get_self_check_stats(user_id):
-#     conn = get_db_connection()
-#     with conn:
-#         with conn.cursor() as cursor:
-#             cursor.execute("SELECT COUNT(*) AS count FROM self_check_logs WHERE user_id = %s", (user_id,))
-#             total_row = cursor.fetchone()
-#             print("Total row returned:", total_row)
-#             total = total_row["count"] if total_row else 0
-
-#             cursor.execute("""
-#                 SELECT COUNT(*) AS count FROM self_check_logs 
-#                 WHERE user_id = %s AND risk_level = 'Low'
-#             """, (user_id,))
-#             low_row = cursor.fetchone()
-#             low = low_row["count"] if low_row else 0
-
-#             cursor.execute("""
-#                 SELECT COUNT(*) AS count FROM self_check_logs 
-#                 WHERE user_id = %s AND risk_level = 'High'
-#             """, (user_id,))
-#             high_row = cursor.fetchone()
-#             high = high_row["count"] if high_row else 0
-
-#     return total, low, high
-
-# def get_recent_clusters(user_id):
-#     cluster_df = pd.read_csv("all_cluster_profiles.csv")
-
-#     # Build a lookup: {(group_label, cluster_num): (friendly_name, description)}
-#     cluster_info = {}
-#     for _, row in cluster_df.iterrows():
-#         group_label = row["Group"]
-#         cluster_num = int(row["Cluster"])
-#         friendly_name = row.get("Cluster_Name", f"{group_label} Cluster {cluster_num}")
-#         description = row.get("Cluster_Description", "No description provided.")
-#         cluster_info[(group_label, cluster_num)] = (friendly_name, description)
-
-#     recent_clusters = []
-
-#     # Query the two most recent high-risk responses
-#     conn = get_db_connection()
-#     with conn:
-#         with conn.cursor(cursor=DictCursor) as cursor:
-#             cursor.execute("""
-#                 SELECT cluster, prediction_result, submitted_at 
-#                 FROM high_risk_responses 
-#                 WHERE user_id = %s 
-#                 ORDER BY submitted_at DESC 
-#                 LIMIT 2
-#             """, (user_id,))
-#             results = cursor.fetchall()
-
-#     for row in results:
-#         cluster_num = int(row["cluster"])
-#         pred_result = row["prediction_result"]
-#         date_str = row["submitted_at"].strftime("%Y-%m-%d")
-
-#         # Map prediction_result to group name
-#         group = (
-#             "Moderate" if pred_result == 1 else
-#             "Severe" if pred_result == 2 else
-#             "Mild"
-#         )
-
-#         # Get custom name and description
-#         friendly_name, description = cluster_info.get((group, cluster_num), (f"{group} – Cluster {cluster_num}", "No description available."))
-
-#         recent_clusters.append({
-#             "label": friendly_name,
-#             "date": date_str,
-#             "description": description
-#         })
-
-#     return recent_clusters
-
-# def save_reflection(user_id, module_name, reflection):
-#     conn = get_db_connection()
-#     with conn:
-#         with conn.cursor() as cursor:
-#             cursor.execute("""
-#                 INSERT INTO user_reflections (user_id, module_name, reflection)
-#                 VALUES (%s, %s, %s)
-#             """, (user_id, module_name, reflection))
-#         conn.commit()
 
 def save_high_risk_response(user_id, age, study_hours, coursework_pressure, academic_workload,
                              sleep_hours, physical_activity, isolation, financial_stress,
@@ -1237,74 +1089,86 @@ elif st.session_state.page == "high_risk_pathway":
                             if cluster_assignment == 0:
                                 st.markdown("""
                                 ### 🌀 *The Overwhelmed Balancer* – Moderate Group
-                                
+                    
                                 **Profile Insights:**
                                 - High coursework pressure (**0.71**) despite moderate academic workload (**0.54**) and low study hours (**0.23**) — possibly due to procrastination or poor stress coping.
                                 - Moderate levels of **co-curricular involvement (0.40)** and **physical activity (0.47)** — trying to stay balanced.
                                 - Noticeable **financial stress (0.53)** and **early signs of suicidal thoughts (0.32)** — suggesting emotional vulnerability.
                                 - Average age is around **20–21**, possibly facing academic transition stress.
-                            
+                    
                                 **Summary:**  
                                 This group may struggle with time management and emotional stress despite a manageable workload.
-                            
+                    
                                 **Advice Focus:**
-                                - Encourage **time management**, **stress reappraisal**, and **building coping strategies**.
-                                - Introduce reflective journaling and resilience-focused exercises.
+                                - **Prioritize mental well-being:** Set aside regular time for relaxation and self-reflection. Practice mindful breathing or meditation to reduce anxiety from coursework pressure.
+                                - **Build supportive routines:** Structure your day with small, achievable goals for study and breaks. Use planners or habit trackers to visualize progress.
+                                - **Reach out for help:** Share your feelings about stress with trusted friends, family, or campus counselors. Early support can prevent escalation.
+                                - **Try resilience-building activities:** Journaling, gratitude exercises, and positive self-affirmations can help reframe negative thoughts and boost emotional strength.
+                                - **Stay active:** Moderate exercise, even short walks, can improve mood and energy.
                                 """)
                     
                             elif cluster_assignment == 1:
                                 st.markdown("""
                                 ### 🌫️ *The Drifting Observer* – Moderate Group
-                                
+                    
                                 **Profile Insights:**
                                 - Lowest **co-curricular involvement (0.22)** and **physical activity (0.42)** — indicating social and physical disengagement.
                                 - Younger age group (**~18 years**) with **low coursework pressure (0.44)** and **manageable stress levels**.
                                 - Mild presence of suicidal thoughts (**0.33**) suggests potential early warning signs.
                                 - Minimal isolation (**0.25**) — students are not disconnected, but may feel **unmotivated**.
-                            
+                    
                                 **Summary:**  
                                 These students are socially and physically inactive, possibly due to emotional detachment or a lack of academic direction.
-                            
+                    
                                 **Advice Focus:**
-                                - Encourage **peer bonding**, **structured academic goals**, and **gentle motivational interventions**.
-                                - Promote participation in low-pressure communities and interest-based groups.
+                                - **Reconnect socially:** Join interest-based clubs or study groups to foster new friendships and a sense of belonging.
+                                - **Set gentle goals:** Rather than aiming for perfection, celebrate small achievements in your studies or social life.
+                                - **Practice self-kindness:** Avoid harsh self-criticism if you feel unmotivated; recognize that it’s okay to seek help and take breaks.
+                                - **Incorporate light activity:** Even easy movement like stretching or casual sports can support emotional health.
+                                - **Monitor mental signals:** If feelings of detachment or sadness persist, consider speaking with a mental health professional.
                                 """)
-                                
+                    
                         elif group_label == "Severe":
                             if cluster_assignment == 1:
                                 st.markdown("""
                                 ### 🎯 *The Silent Perfectionist* – Severe Group
-                                
+                    
                                 **Profile Insights:**
                                 - Extremely high coursework pressure (**0.78**) despite only moderate academic workload (**0.62**) — suggests **internalized pressure or perfectionism**.
                                 - **Less financial stress** — their stress likely comes from **self-imposed expectations**, not external hardship.
                                 - Slightly **better sleep quality (0.56)** and **lower suicidal thoughts (0.33)** than other severe groups — but signs may be **masked**.
                                 - Moderate levels of **co-curricular involvement** and **physical activity** — indicating **social participation**, but emotional weight remains.
-                            
+                    
                                 **Summary:**  
                                 This group is high-functioning on the outside but battles **internal perfectionism** that silently impacts mental health.
-                            
+                    
                                 **Advice Focus:**
-                                - Address **maladaptive perfectionism** and **unhealthy self-expectations**.
-                                - Promote **healthy goal-setting**, **self-compassion**, and **emotional self-awareness**.
+                                - **Challenge perfectionist thinking:** Remind yourself that making mistakes is part of growth. Practice self-compassion and avoid comparing yourself to others.
+                                - **Set realistic expectations:** Focus on progress, not perfection. Use “good enough” goals to reduce internal pressure.
+                                - **Care for your emotional health:** Schedule regular relaxation, creative hobbies, or social time to balance academic demands.
+                                - **Talk about your feelings:** Share concerns about self-imposed pressure with mentors, friends, or therapists—opening up can help lighten emotional burdens.
+                                - **Maintain healthy habits:** Continue physical activity and social engagement, but listen to your body and rest when needed.
                                 """)
-    
+                    
                             elif cluster_assignment == 0:
                                 st.markdown("""
                                 ### 💢 *The Struggling Achiever* – Severe Group
-                                
+                    
                                 **Profile Insights:**
                                 - High **academic workload (0.68)** and **coursework pressure (0.69)** — academic overload is intense.
                                 - Very low **sleep (0.47)** and **extremely high financial stress (1.00)** — signs of major life strain.
                                 - **High suicidal thoughts (0.32)** despite some participation in physical and co-curricular activities — may be masking severe distress.
                                 - Very young age (**~17–18 years old**) suggests difficulty adjusting to university-level challenges.
-                            
+                    
                                 **Summary:**  
                                 These students are under severe academic, financial, and emotional stress and may be silently struggling.
-                            
+                    
                                 **Advice Focus:**
-                                - Provide **crisis support**, **emergency counseling**, and **financial aid pathways**.
-                                - Promote early intervention through trained peer listeners and hotline accessibility.
+                                - **Seek immediate support:** Don’t hesitate to reach out to crisis counselors, hotlines, or mental health services if distress feels overwhelming.
+                                - **Establish a sleep routine:** Try to set a regular bedtime, limit screen time before bed, and create a calming nighttime ritual.
+                                - **Address financial worries:** Connect with student support services about financial aid, scholarships, or budgeting workshops to reduce stressors.
+                                - **Practice emotional check-ins:** Use mood tracking apps or daily reflection to recognize your emotional state and ask for help early.
+                                - **Balance workload:** Break tasks into manageable steps and allow yourself regular rest—your health comes first.
                                 """)
                     
                     # 💾 Save to database
