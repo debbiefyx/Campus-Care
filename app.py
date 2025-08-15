@@ -968,7 +968,7 @@ elif st.session_state.page == "high_risk_pathway":
     
         st.markdown("#### 🏃 Scene 5: Staying Active")
         with st.chat_message("assistant"):
-            st.markdown("*How often do you get moving — like exercising, walking, or stretching?*")
+            st.markdown("*How often do you get moving — like exercising, walking, or stretching on a weekly basis?*")
         physical_activity = st.slider("🏋️‍♀️ Physical Activity Frequency", 1, 5, 3, format="%d")
         st.markdown("---")
     
