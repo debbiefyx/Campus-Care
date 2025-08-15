@@ -509,7 +509,7 @@ if st.session_state.page == "overview":
 # --------------------------------------
 elif st.session_state.page == "auth":
     st.markdown("### 👤 Welcome to Campus Care")
-    st.markdown("Remember to sign up first then log in!")
+    st.markdown("Remember to sign up before you log in!")
     auth_mode = st.radio("Choose an option", ["Log In", "Sign Up"], horizontal=True)
 
     username = st.text_input("Username")
@@ -2109,7 +2109,7 @@ elif st.session_state.page == "dashboard":
                 </div>
                 
                 <div style="text-align:center; font-family: 'Segoe UI', sans-serif; font-size: 16px; margin-top: 10px; color: #222;">
-                  You have had both high and low risk check-ins, keep it up!
+                   You’ve embraced both challenges and calm moments in your journey—keep exploring and growing with every step! 🌟
                 </div>
                 """, unsafe_allow_html=True)
 
