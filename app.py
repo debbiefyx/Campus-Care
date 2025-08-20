@@ -509,7 +509,7 @@ if st.session_state.page == "overview":
 # --------------------------------------
 elif st.session_state.page == "auth":
     st.markdown("### 👤 Welcome to Campus Care")
-    st.markdown("Remember to sign up before you log in!")
+    st.markdown("Remember to sign up before you log in if you are new!")
     st.markdown("")
     st.markdown("Rest assured, your credentials and data are encrypted and will not be disclosed to anyone outside of Campus Care.")
     st.markdown("")
