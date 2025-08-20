@@ -511,6 +511,8 @@ elif st.session_state.page == "auth":
     st.markdown("### 👤 Welcome to Campus Care")
     st.markdown("Remember to sign up before you log in!")
     st.markdown("")
+    st.markdown("Rest assured, your credentials and data are encrypted and will not be disclosed to anyone outside of Campus Care.")
+    st.markdown("")
     auth_mode = st.radio("Choose an option", ["Log In", "Sign Up"], horizontal=True)
 
     username = st.text_input("Username")
