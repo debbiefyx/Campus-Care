@@ -929,7 +929,7 @@ elif st.session_state.page == "high_risk_pathway":
         # Likert scale legend
         st.markdown("""
         **Rate based on this scale:**
-        😞 1 – None of the time | 😕 2 – Rarely | 😐 3 – Some of the time | 🙂 4 – Often | 😄 5 – All of the time
+        😞 1 – Very Low | 😕 2 – Low | 😐 3 – Neutral | 🙂 4 – High | 😄 5 – Very High
         """)
         st.markdown("---")
     
@@ -1078,7 +1078,7 @@ elif st.session_state.page == "high_risk_pathway":
                     fig.update_layout(
                         polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
                         showlegend=False,
-                        title=f"🧭 Profile Radar: Cluster {cluster_name} ({group_label})"
+                        title=f"🧭 Profile Radar: {cluster_name} ({group_label})"
                     )
                     st.plotly_chart(fig, use_container_width=True)
                     
